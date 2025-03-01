@@ -34,7 +34,6 @@ void unpack(uint16_t packed, bool* output_arr, int& k, int* indices) {
     }
 }
 
-
 // Функція для виведення бітового представлення числа
 void print_binary(uint16_t number) {
     for (int i = 15; i >= 0; --i) {
@@ -42,7 +41,7 @@ void print_binary(uint16_t number) {
         if (i % 4 == 0) std::cout << ' ';
         if (i % 8 == 0) std::cout << ' ';
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 }
 
 int main() {
@@ -50,8 +49,7 @@ int main() {
 
     bool input_arr[ARRAY_SIZE] = { false };
     std::string input;
-    std::cout << "Enter numbers (bit positions 0-15), separated by commas: ";
-    std::cin >> std::ws; // Очистка зайвих пробілів
+    std::cout << "Input bit numbers, separated by commas: ";
     std::getline(std::cin, input);
 
     std::stringstream ss(input);
@@ -59,23 +57,37 @@ int main() {
     int indices[ARRAY_SIZE] = { 0 };
     int index = 0;
     while (std::getline(ss, value, ',')) {
-        int bit_position = std::stoi(value);
-        if (bit_position >= 0 && bit_position < ARRAY_SIZE) {
-            input_arr[bit_position] = true;
-            indices[index++] = bit_position;
+        try {
+            int bit_position = std::stoi(value);
+            if (bit_position >= 0 && bit_position < ARRAY_SIZE) {
+                input_arr[bit_position] = true;
+                indices[index++] = bit_position;
+            }
+            else {
+                std::cerr << "Error: Bit position " << bit_position << " is out of range (0-15)." << std::endl;
+                return 1;
+            }
+        }
+        catch (const std::invalid_argument& e) {
+            std::cerr << "Error: Invalid input '" << value << "'." << std::endl;
+            return 1;
+        }
+        catch (const std::out_of_range& e) {
+            std::cerr << "Error: Input '" << value << "' is out of range." << std::endl;
+            return 1;
         }
     }
 
     uint16_t packed = pack(input_arr, ARRAY_SIZE);
-    std::cout << "Packed value: ";
+    //std::cout << "Packed value: ";
     print_binary(packed);
-
+	std::cout << "; ";
     bool output_arr[ARRAY_SIZE] = { false };
     int k = 0;
     int unpacked_indices[ARRAY_SIZE] = { 0 };
     unpack(packed, output_arr, k, unpacked_indices);
 
-    std::cout << "Unpacked values: ";
+    //std::cout << "Unpacked values: ";
     for (int i = 0; i < index; ++i) {
         if (i > 0) {
             std::cout << ",";
@@ -86,11 +98,6 @@ int main() {
 
     return 0;
 }
-
-
-
-
-
 
 
 // testl
