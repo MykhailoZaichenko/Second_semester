@@ -1,18 +1,12 @@
 ﻿//Варіант 9
 //Дано масив n(1 <= n <= 16) значень логічного типу(true / fatse).
-//1.	Реалізувати функцію для ïx упакування в беззнакове(unsigned) 16 - bit число, в якому k - и біт приймас значения 1, тоді i тільки тоді, коли k - й елемент масиву містить значення true.Функція повинна мати наступну сигнатуру :
-//uint16_t pack(bool* input_arr, int n)
-//2.	Реалізувати  функцію  для  розпакування  чисел  із  ïx  упакованого
-//беззнакового(unsigned) 16 - bit представлення в масив цілих чисел.Після розпакування початковий порядок чисел повинен відновитись.Функціs повинна мати наступну сигнатуру :
-//void unpack(uintl6_t packed, bool* output_arr, int& k}
-//3.	Реаліsувати функцііо для виведення в консоль бітового представлення упакованого числа.ІІід час виведення кожні 4 біти числа повинні бути розділені прогалиноіо(space), а кожні 8 бітів двома прогалинами.Функія повинна мати наступну сигнатуру :
-//void print_binary(uint16_t nuшber)
 
 #include <iostream>
 #include <cstdint>
 #include <sstream>
 
-// Функція для упаковки логічного масиву в 16-бітне число
+//1.	Реалізувати функцію для ïx упакування в беззнакове(unsigned) 16 - bit число, в якому k - и біт приймас значения 1, тоді i тільки тоді, коли k - й елемент масиву містить значення true.Функція повинна мати наступну сигнатуру :
+//uint16_t pack(bool* input_arr, int n)
 uint16_t pack(bool* input_arr, int n) {
     uint16_t packed = 0;
     for (int i = 0; i < n; ++i) {
@@ -23,7 +17,9 @@ uint16_t pack(bool* input_arr, int n) {
     return packed;
 }
 
-// Функція для розпаковки 16-бітного числа в масив логічних значень
+//2.	Реалізувати  функцію  для  розпакування  чисел  із  ïx  упакованого
+//беззнакового(unsigned) 16 - bit представлення в масив цілих чисел.Після розпакування початковий порядок чисел повинен відновитись.Функціs повинна мати наступну сигнатуру :
+//void unpack(uintl6_t packed, bool* output_arr, int& k}
 void unpack(uint16_t packed, bool* output_arr, int& k) {
     k = 0;
     for (int i = 0; i < 16; ++i) {
@@ -34,44 +30,38 @@ void unpack(uint16_t packed, bool* output_arr, int& k) {
     }
 }
 
-// Функція для виведення бітового представлення числа
+//3.	Реаліsувати функцііо для виведення в консоль бітового представлення упакованого числа.ІІід час виведення кожні 4 біти числа повинні бути розділені прогалиноіо(space), а кожні 8 бітів двома прогалинами.Функія повинна мати наступну сигнатуру :
+//void print_binary(uint16_t nuшber)
 void print_binary(uint16_t number) {
     for (int i = 15; i >= 0; --i) {
         std::cout << ((number >> i) & 1);
         if (i % 4 == 0 && i != 0) std::cout << ' ';
         if (i % 8 == 0 && i != 0) std::cout << ' ';
     }
-    //std::cout << std::endl;
 }
 
 int main() {
     const int ARRAY_SIZE = 16;
 
     bool input_arr[ARRAY_SIZE] = { false };
-    std::string input;
+    char input[100];
     std::cout << "Input bit position, separated by commas: ";
-    std::getline(std::cin, input);
+    std::cin.getline(input, 100);
 
-    std::stringstream ss(input);
-    std::string value;
+    char* token = std::strtok(input, ",");
     int indices[ARRAY_SIZE] = { 0 };
     int index = 0;
-    while (std::getline(ss, value, ',')) {
-        try {
-            int bit_position = std::stoi(value);
-            if (bit_position >= 0 && bit_position < ARRAY_SIZE) {
-                input_arr[bit_position] = true;
-                indices[index++] = bit_position;
-            }
-            else {
-                std::cerr << "Error: Bit position " << bit_position << " is out of range (0-15)." << std::endl;
-                return 1;
-            }
+    while (token != nullptr) {
+        int bit_position = std::stoi(token);
+        if (bit_position >= 0 && bit_position < ARRAY_SIZE) {
+            input_arr[bit_position] = true;
+            indices[index++] = bit_position;
         }
-        catch (const std::invalid_argument& e) {
-            std::cerr << "Error: Invalid input '" << value << "'." << std::endl;
+        else {
+            std::cerr << "Error: Bit position " << bit_position << " is out of range (0-15)." << std::endl;
             return 1;
         }
+        token = std::strtok(nullptr, ",");
     }
 
     uint16_t packed = pack(input_arr, ARRAY_SIZE);
@@ -92,6 +82,7 @@ int main() {
 
     return 0;
 }
+
 
 
 // testl
