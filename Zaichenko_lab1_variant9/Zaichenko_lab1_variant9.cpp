@@ -9,7 +9,7 @@
 //uint16_t pack(bool* input_arr, int n)
 uint16_t pack(bool* input_arr, int n) {
     uint16_t packed = 0;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i) {
         if (input_arr[i]) {
             packed |= (1 << i);
         }
@@ -21,8 +21,9 @@ uint16_t pack(bool* input_arr, int n) {
 //беззнакового(unsigned) 16 - bit представлення в масив цілих чисел.Після розпакування початковий порядок чисел повинен відновитись.Функціs повинна мати наступну сигнатуру :
 //void unpack(uintl6_t packed, bool* output_arr, int& k}
 void unpack(uint16_t packed, bool* output_arr, int& k) {
-    for (int i = 0; i < 16; i++) {
-        output_arr[i] = (packed & (1 << i));
+    k = 0;
+    for (int i = 0; i < 16; ++i) {
+        output_arr[i] = (packed & (1 << i)) != 0;
         if (output_arr[i]) {
             k++;
         }
@@ -32,7 +33,7 @@ void unpack(uint16_t packed, bool* output_arr, int& k) {
 //3.	Реаліsувати функцііо для виведення в консоль бітового представлення упакованого числа.ІІід час виведення кожні 4 біти числа повинні бути розділені прогалиноіо(space), а кожні 8 бітів двома прогалинами.Функія повинна мати наступну сигнатуру :
 //void print_binary(uint16_t nuшber)
 void print_binary(uint16_t number) {
-    for (int i = 15; i >= 0; i--) {
+    for (int i = 15; i >= 0; --i) {
         std::cout << ((number >> i) & 1);
         if (i % 4 == 0 && i != 0) std::cout << ' ';
         if (i % 8 == 0 && i != 0) std::cout << ' ';
@@ -52,11 +53,10 @@ int main() {
     }
 
     bool input_arr[16] = { false };
-    std::cout << "Enter " << n << " bit positions (0-15), separated by spaces: ";
-
     int bits[16] = { 0 };
     int index = 0;
     for (int i = 0; i < n; ++i) {
+        std::cout << "arr[" << i << "]: ";
         int bit_position;
         std::cin >> bit_position;
         if (bit_position >= 0 && bit_position < 16) {
@@ -69,22 +69,25 @@ int main() {
         }
     }
 
-    //std::cout << "Initial array: ";
-    //for (int i = 0; i < 16; ++i) {
-    //    std::cout << input_arr[i] << " ";
-    //}
-    //std::cout << std::endl;
+    std::cout << "Input array: ";
+    for (int i = 0; i < n; ++i) {
+        if (i > 0) {
+            std::cout << ",";
+        }
+        std::cout << bits[i];
+    }
+    std::cout << std::endl;
 
     uint16_t packed = pack(input_arr, 16); // Fix: Use full array size for packing
-    std::cout << "Output: ";
+    std::cout << "Packed number: ";
     print_binary(packed);
-    std::cout << "; ";
+    std::cout << ";" << std::endl;
 
     bool output_arr[16] = { false };
     int k = 0;
     unpack(packed, output_arr, k);
-
-    for (int i = 0; i < index; ++i) {
+    std::cout << "Output array: ";
+    for (int i = 0; i < n; ++i) {
         if (i > 0) {
             std::cout << ",";
         }
