@@ -4,8 +4,6 @@
 
 #include <iostream>
 #include <cstdint>
-#include <sstream>
-#include <cstdlib>
 
 //1.	Реалізувати функцію для ïx упакування в беззнакове(unsigned) 16 - bit число, в якому k - и біт приймас значения 1, тоді i тільки тоді, коли k - й елемент масиву містить значення true.Функція повинна мати наступну сигнатуру :
 //uint16_t pack(bool* input_arr, int n)
@@ -44,56 +42,49 @@ void print_binary(uint16_t number) {
 int main() {
     const int ARRAY_SIZE = 16;
 
-    bool input_arr[ARRAY_SIZE] = { false };
-    char input[100];
+    int n;
+    std::cout << "Enter number of elements (1-16): ";
+    std::cin >> n;
 
-    // Read bit positions from user input
-    std::cout << "Input bit position, separated by commas: ";
-    std::cin.getline(input, 100);
-
-	char* token = std::strtok(input, ","); //splits the input string at commas and returns a pointer to the first token found in the string.
-    int bits[ARRAY_SIZE] = { 0 };
-    int index = 0;
-
-    while (token != nullptr) {
-        try {
-            // Check if token contains only digits
-            for (size_t i = 0; i < std::strlen(token); ++i) {
-                if (!std::isdigit(token[i])) {
-                    throw std::invalid_argument("Invalid input: non-numeric character detected.");
-                }
-            }
-
-            int bit_position = std::stoi(token); // converts the token(string) to an integer.
-            if (bit_position >= 0 && bit_position < ARRAY_SIZE) {
-                input_arr[bit_position] = true;
-                bits[index++] = bit_position;
-            }
-            else {
-                throw std::out_of_range("Error: Bit position is out of range (0-15).\n");
-            }
-        }
-        catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
-            return 1;
-        }
-
-		token = std::strtok(nullptr, ","); // Get next token in the string (nullptr is used to continue from the last token).
+    if (n < 1 || n > 16) {
+        std::cout << "Error: n must be between 1 and 16." << std::endl;
+        return 1;
     }
 
-    // Perform packing
-    uint16_t packed = pack(input_arr, ARRAY_SIZE);
+    bool input_arr[16] = { false };
+    std::cout << "Enter " << n << " bit positions (0-15), separated by spaces: ";
+
+    int bits[16] = { 0 };
+    int index = 0;
+    for (int i = 0; i < n; ++i) {
+        int bit_position;
+        std::cin >> bit_position;
+        if (bit_position >= 0 && bit_position < 16) {
+            input_arr[bit_position] = true;
+            bits[index++] = bit_position;
+        }
+        else {
+            std::cerr << "Error: Bit position " << bit_position << " is out of range (0-15)." << std::endl;
+            return 1;
+        }
+    }
+
+    //std::cout << "Initial array: ";
+    //for (int i = 0; i < 16; ++i) {
+    //    std::cout << input_arr[i] << " ";
+    //}
+    //std::cout << std::endl;
+
+    uint16_t packed = pack(input_arr, 16); // Fix: Use full array size for packing
     std::cout << "Output: ";
     print_binary(packed);
     std::cout << "; ";
 
-    // Perform unpacking
-    bool output_arr[ARRAY_SIZE] = { false };
+    bool output_arr[16] = { false };
     int k = 0;
     unpack(packed, output_arr, k);
 
-    // Print unpacked bit positions
-    for (int i = 0; i < index; i++) {
+    for (int i = 0; i < index; ++i) {
         if (i > 0) {
             std::cout << ",";
         }
