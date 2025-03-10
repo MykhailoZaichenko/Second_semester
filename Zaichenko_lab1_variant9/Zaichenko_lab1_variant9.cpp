@@ -20,13 +20,9 @@ uint16_t pack(bool* input_arr, int n) {
 //2.	Реалізувати  функцію  для  розпакування  чисел  із  ïx  упакованого
 //беззнакового(unsigned) 16 - bit представлення в масив цілих чисел.Після розпакування початковий порядок чисел повинен відновитись.Функціs повинна мати наступну сигнатуру :
 //void unpack(uintl6_t packed, bool* output_arr, int& k}
-void unpack(uint16_t packed, bool* output_arr, int& k) {
-
-    for (int i = 0; i < 16; ++i) {
+void unpack(uint16_t packed, bool* output_arr, int k) {
+    for (int i = 0; i < k; ++i) {
 		output_arr[i] = (packed & (1 << i)) != 0; // Перевірка чи i-й біт встановлений в 1
-        if (output_arr[i]) {
-
-        }
     }
 }
 
@@ -35,8 +31,8 @@ void unpack(uint16_t packed, bool* output_arr, int& k) {
 void print_binary(uint16_t number) {
     for (int i = 15; i >= 0; --i) {
         std::cout << ((number >> i) & 1);
-        if (i % 4 == 0 && i != 0) std::cout << ' ';
-        if (i % 8 == 0 && i != 0) std::cout << ' ';
+        if (i % 4 == 0 && i != 0) std::cout << '_';
+        if (i % 8 == 0 && i != 0) std::cout << '_';
     }
 }
 
@@ -47,7 +43,7 @@ int main() {
     std::cout << "Enter number of elements (1-16): ";
     while (!(std::cin >> n) || n < 1 || n > 16 || std::cin.peek() != '\n') {
         std::cout << "Error: n must be a valid integer between 1 and 16." << std::endl;
-        std::cin.clear(); // Clear error flag
+        std::cin.clear(); // Прибирає помилку
         std::cin.ignore(10000, '\n');
         std::cout << "Enter number of elements (1-16): ";
     }
@@ -59,8 +55,8 @@ int main() {
         bool value;
         while (!(std::cin >> std::boolalpha >> value)) {
             std::cout << "Invalid input. Please enter 'true' or 'false': ";
-            std::cin.clear(); // Clear error flag
-            std::cin.ignore(10000, '\n'); // Discard invalid input
+            std::cin.clear(); // Прибирає помилку
+			std::cin.ignore(10000, '\n'); // Очищає ввід юзера
         }
         input_arr[i] = value;
     }
@@ -81,8 +77,7 @@ int main() {
     std::cout << ";" << std::endl;
 
     bool output_arr[ARRAY_SIZE];
-    int k = 0;
-    unpack(packed, output_arr, k);
+    unpack(packed, output_arr, n);
     std::cout << "Output array: ";
     for (int i = 0; i < n; ++i) {
         if (i > 0) {
@@ -114,12 +109,25 @@ int main() {
 //Packed number : 0000 0000  0000 0001;
 //Output array: true
 // 
+// test2.1
+// Enter number of elements (1-16): 1
+// arr[0](true / false) : false
+// Input array : false
+// Packed number : 0000 0000  0000 0000;
+// Output array : false
+// 
 // test3
 //Input array: true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true
 //Packed number : 1111 1111  1111 1111;
 //Output array: true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true
 //
-// test6
+// test3.1
+// Enter number of elements (1-16): 16
+//Input array : false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+//Packed number : 0000 0000  0000 0000;
+//Output array: false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+// 
+// test4
 //Enter number of elements(1 - 16) : 43
 //Error : n must be a valid integer between 1 and 16.
 //Enter number of elements(1 - 16) : 1
@@ -128,7 +136,7 @@ int main() {
 //Packed number : 0000 0000  0000 0001;
 //Output array: true
 // 
-// test7
+// test5
 //Enter number of elements(1 - 16) : df
 //Error : n must be a valid integer between 1 and 16.
 //Enter number of elements(1 - 16) : 1
@@ -137,7 +145,7 @@ int main() {
 //Packed number : 0000 0000  0000 0001;
 //Output array: true
 //
-// test8
+// test6
 //Enter number of elements(1 - 16) : 1
 //arr[0](true / false) : df
 //Invalid input.Please enter 'true' or 'false' : true
