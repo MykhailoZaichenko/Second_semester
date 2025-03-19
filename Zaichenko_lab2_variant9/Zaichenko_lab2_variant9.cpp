@@ -60,6 +60,20 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
 
 // Рекурсивний метод половинного ділення
 double bisection_recursive(double (*f)(double), double a, double b, double eps, int n, int& iterations) {
+    if (iterations == 0) {
+        double fa = f(a), fb = f(b);
+
+        if (fa * fb > 0) {
+            if (fa > 0 && fb > 0)
+                std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] не містить кореня, оскільки значення функції в обох кінцях додатні.\n";
+            else if (fa < 0 && fb < 0)
+                std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] не містить кореня, оскільки значення функції в обох кінцях від'ємні.\n";
+            else
+                std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] містить декілька коренів.\n";
+            return NAN;
+        }
+    }
+
     double mid = (a + b) / 2;
     double fmid = f(mid);
 
@@ -90,6 +104,8 @@ int main() {
     int choice;
     while (!(std::cin >> choice) || choice < 1 || choice > 3) {
         std::cout << "Помилка: введено некоректний номер функції. Введи номер фунції (1-3): ";
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
     }
 
     double (*f)(double) = nullptr;
@@ -105,13 +121,25 @@ int main() {
     int n;
 
     std::cout << "Введіть межі проміжку [a, b]: ";
-    std::cin >> a >> b;
+	while (!(std::cin >> a >> b) || a >= b) {
+		std::cout << "Помилка: a має бути менше за b. Введіть межі проміжку [a, b]: ";
+		std::cin.clear();
+		std::cin.ignore(10000, '\n');
+	}
 
     std::cout << "Введіть точність (eps): ";
-    std::cin >> eps;
+	while (!(std::cin >> eps) || eps <= 0) {
+		std::cout << "Помилка: точність має бути додатним числом. Введіть точність (eps): ";
+		std::cin.clear();
+		std::cin.ignore(10000, '\n');
+	}
 
     std::cout << "Введіть максимальну кількість ітерацій: ";
-    std::cin >> n;
+	while (!(std::cin >> n) || n <= 0) {
+		std::cout << "Помилка: кількість ітерацій має бути додатним числом. Введіть максимальну кількість ітерацій: ";
+		std::cin.clear();
+		std::cin.ignore(10000, '\n');
+	}
 
     int iterations = 0;
 
