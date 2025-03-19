@@ -41,7 +41,7 @@ int main() {
 
     int n;
     std::cout << "Enter number of elements (1-16): ";
-    while (!(std::cin >> n) || n < 1 || n > 16 || std::cin.peek() != '\n') {
+    while (!(std::cin >> n) || n < 1 || n > 16) {
         std::cout << "Error: n must be a valid integer between 1 and 16." << std::endl;
         std::cin.clear(); // Прибирає помилку
         std::cin.ignore(10000, '\n');
