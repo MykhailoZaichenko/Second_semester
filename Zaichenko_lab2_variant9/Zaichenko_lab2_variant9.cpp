@@ -33,19 +33,13 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
     double mid;
     i = 0;
 
-    while ((b - a) / 2 > eps) {
+    while (true) {
         if (i >= n) {
-            std::cout << "\nWarning: Maximum number of iterations reached." << std::endl;
             break;
         }
 
         mid = (a + b) / 2;
         double fmid = f(mid);
-
-        //Чи є вже корененм
-        if (fmid == 0.0) {
-            break;
-        }
 
         if (fabs(fmid) < eps) {
             return mid;
@@ -65,8 +59,31 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
     return mid;
 }
 
+double bisection_recursive_loop(double (*f)(double), double a, double b, double eps, int n, int& i) {
+    double fa = f(a), fb = f(b);
+    double mid = (a + b) / 2;
+    double fmid = f(mid);
+
+    if (i >= n) {
+        return mid;
+    }
+
+    if (fabs(fmid) < eps) {
+        return mid;
+    }
+
+    i++;
+
+    if (f(a) * fmid < 0) {
+        return bisection_recursive_loop(f, a, mid, eps, n, i);
+    }
+    else {
+        return bisection_recursive_loop(f, mid, b, eps, n, i);
+    }
+}
+
 // Рекурсивний половинного ділення
-double bisection_recursive(double (*f)(double), double a, double b, double x0, double eps, int n, int& i) {
+double bisection_recursive(double (*f)(double), double a, double b, double eps, int n, int& i) {
     double fa = f(a), fb = f(b);
 
     if (fa * fb > 0) {
@@ -78,28 +95,7 @@ double bisection_recursive(double (*f)(double), double a, double b, double x0, d
             std::cerr << "Error: The chosen interval [" << a << ", " << b << "] contains multiple roots." << std::endl;
         return NAN;
     }
-
-    if (i >= n) {
-        std::cout << "Warning: Maximum number of iterations reached." << std::endl;
-        return (a + b) / 2;
-    }
-
-    double mid = (a + b) / 2;
-    double fmid = f(mid);
-
-    //Чи є вже коренем
-    if (fmid == 0.0 || fabs(mid - x0) < eps || (b - a) / 2 < eps) {
-        return mid;
-    }
-
-    i++;
-
-    if (f(a) * fmid < 0) {
-        return bisection_recursive(f, a, mid, x0, eps, n, i);
-    }
-    else {
-        return bisection_recursive(f, mid, b, x0, eps, n, i);
-    }
+	return bisection_recursive_loop(f, a, b, eps, n, i);
 }
 
 int main() {
@@ -152,8 +148,10 @@ int main() {
 
     int iterations = 0;
 
-    // Execute iterative method
     double root_iter = bisection_iterative(f, a, b, eps, n, iterations);
+    if (iterations >= n) {
+        std::cout << "\nWarning: Maximum number of iterations reached." << std::endl;
+    }
     std::cout << "Iterative method:" << std::endl;
     std::cout << "Root found: " << std::fixed << std::setprecision(8) << root_iter << std::endl;
     std::cout << "Number of iterations: " << iterations << std::endl;
@@ -161,10 +159,11 @@ int main() {
 
 	std::cout << std::endl;
 
-    // Execute recursive method
     iterations = 0;
-    double x0 = a; // Initial approximation
-    double root_rec = bisection_recursive(f, a, b, x0, eps, n, iterations);
+    double root_rec = bisection_recursive(f, a, b, eps, n, iterations);
+    if (iterations >= n) {
+        std::cout << "\nWarning: Maximum number of iterations reached." << std::endl;
+    }
     std::cout << "Recursive method:" << std::endl;
     std::cout << "Root found: " << std::fixed << std::setprecision(8) << root_rec << std::endl;
     std::cout << "Number of iterations: " << iterations << std::endl;
@@ -183,22 +182,22 @@ int main() {
 // f(root) = -0.00097656
 //
 // Recursive output:
-// Root found: 4.50012207
-// Number of iterations: 13
-// f(root) = 0.00024414
+// Root found: 4.49951172
+// Number of iterations : 11
+// f(root) = -0.00097656
 //
 // test2
 //
 // input: f(x)=2x-9; [0, 10]; eps = 1e-5; n = 100
 // Iterative output: 
-// Root found: 4.49998856 
-// Number of iterations: 19
-// f(root) = -0.00002289
+// Root found : 4.49999809
+// Number of iterations : 19
+// f(root) = -0.00000381
 //
 // Recursive output:
-// Root found: 4.49999809
-// Number of iterations: 19
-// f(root) = 0.00000381
+// Root found : 4.49999809
+// Number of iterations : 19
+// f(root) = -0.00000381
 //
 // test3
 //
@@ -219,9 +218,9 @@ int main() {
 //
 // input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-3; n = 100
 // Iterative output: 
-// Root found : 0.79492188
+// Root found : 0.79394531
 // Number of iterations : 10
-// f(root) = -0.00462352
+// f(root) = -0.00092552
 //
 // Recursive output:
 // Root found : 0.79394531
@@ -237,9 +236,9 @@ int main() {
 // f(root) = -0.00000244
 //
 // Recursive output:
-// Root found : 0.79369354
-// Number of iterations : 17
-// f(root) = 0.00002640
+// Root found : 0.79370117
+// Number of iterations : 12
+// f(root) = -0.00000244
 //
 // test6
 //
@@ -259,9 +258,9 @@ int main() {
 // test7
 // input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-4, 3]; eps = 1e-3; n = 100
 // Iterative output: 
-// Root found : -3.58813477
+// Root found : -3.58898926
 // Number of iterations : 12
-// f(root) = 0.00208829
+// f(root) = 0.00038723
 //
 // Recursive output:
 // Root found : -3.58898926
@@ -271,9 +270,9 @@ int main() {
 // test8
 // input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-4, 3]; eps = 1e-5; n = 100
 // Iterative output: 
-// Root found : -3.58918953
+// Root found : -3.58918285
 // Number of iterations : 19
-// f(root) = -0.00001158
+// f(root) = 0.00000172
 //
 // Recursive output:
 // Root found : -3.58918285
