@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <iomanip>
 
-// Functions to calculate f(x)
 double f1(double x) {
     return 2 * x - 9;
 }
@@ -17,7 +16,7 @@ double f3(double x) {
     return 0.75 * x * sin(PI * x / 4) + 0.9 * cos(PI * x / 4);
 }
 
-// Iterative bisection method
+// Ітеративний половинного ділення
 double bisection_iterative(double (*f)(double), double a, double b, double eps, int n, int& i) {
     double fa = f(a), fb = f(b);
 
@@ -43,6 +42,11 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
         mid = (a + b) / 2;
         double fmid = f(mid);
 
+        //Чи є вже корененм
+        if (fmid == 0.0) {
+            break;
+        }
+
         if (fabs(fmid) < eps) {
             return mid;
         }
@@ -61,7 +65,7 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
     return mid;
 }
 
-// Recursive bisection method
+// Рекурсивний половинного ділення
 double bisection_recursive(double (*f)(double), double a, double b, double x0, double eps, int n, int& i) {
     double fa = f(a), fb = f(b);
 
@@ -76,31 +80,29 @@ double bisection_recursive(double (*f)(double), double a, double b, double x0, d
     }
 
     if (i >= n) {
-        std::cout << "\nWarning: Maximum number of iterations reached." << std::endl;
+        std::cout << "Warning: Maximum number of iterations reached." << std::endl;
         return (a + b) / 2;
     }
 
     double mid = (a + b) / 2;
     double fmid = f(mid);
 
-    if (fabs(mid - x0) < eps || (b - a) / 2 < eps) {
+    //Чи є вже коренем
+    if (fmid == 0.0 || fabs(mid - x0) < eps || (b - a) / 2 < eps) {
         return mid;
     }
 
     i++;
 
     if (f(a) * fmid < 0) {
-        return bisection_recursive(f, a, mid, mid, eps, n, i);
+        return bisection_recursive(f, a, mid, x0, eps, n, i);
     }
     else {
-        return bisection_recursive(f, mid, b, mid, eps, n, i);
+        return bisection_recursive(f, mid, b, x0, eps, n, i);
     }
 }
 
 int main() {
-    // Set console code page to UTF-8
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
 
     std::cout << "Bisection Method\n";
     std::cout << "1. f(x) = 2x - 9\n";
@@ -194,7 +196,7 @@ int main() {
 // f(root) = -0.00002289
 //
 // Recursive output:
-// Root found: 4.50000000
+// Root found: 4.49999809
 // Number of iterations: 19
 // f(root) = 0.00000381
 //
