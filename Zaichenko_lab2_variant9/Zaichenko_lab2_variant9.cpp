@@ -45,7 +45,8 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
             return mid;
         }
 
-        if (fa * fmid < 0) {
+        if (std::signbit(fa) != std::signbit(fmid)) {
+        //if (fa * fmid < 0) {
             b = mid;
             fb = fmid;
         }
@@ -53,7 +54,7 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
             a = mid;
             fa = fmid;
         }
-        i++;
+		i++;
     }
 
     return mid;
@@ -74,7 +75,8 @@ double bisection_recursive_loop(double (*f)(double), double a, double b, double 
 
     i++;
 
-    if (f(a) * fmid < 0) {
+    if (std::signbit(fa) != std::signbit(fmid)) {
+    //if (f(a) * fmid < 0) {
         return bisection_recursive_loop(f, a, mid, eps, n, i);
     }
     else {
