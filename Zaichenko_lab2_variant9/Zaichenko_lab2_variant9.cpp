@@ -3,9 +3,7 @@
 #include <windows.h>
 #include <iomanip>
 
-
-
-// Функції для обчислення значень f(x)
+// Functions to calculate f(x)
 double f1(double x) {
     return 2 * x - 9;
 }
@@ -19,26 +17,26 @@ double f3(double x) {
     return 0.75 * x * sin(PI * x / 4) + 0.9 * cos(PI * x / 4);
 }
 
-// Ітеративний метод половинного ділення
-double bisection_iterative(double (*f)(double), double a, double b, double eps, int n, int& iterations) {
+// Iterative bisection method
+double bisection_iterative(double (*f)(double), double a, double b, double eps, int n, int& i) {
     double fa = f(a), fb = f(b);
 
     if (fa * fb > 0) {
         if (fa > 0 && fb > 0)
-            std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] не містить кореня, оскільки значення функції в обох кінцях додатні." <<std::endl;
+            std::cerr << "Error: The chosen interval [" << a << ", " << b << "] does not contain a root, as the function values at both ends are positive." << std::endl;
         else if (fa < 0 && fb < 0)
-            std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] не містить кореня, оскільки значення функції в обох кінцях від'ємні." <<std::endl;
+            std::cerr << "Error: The chosen interval [" << a << ", " << b << "] does not contain a root, as the function values at both ends are negative." << std::endl;
         else
-            std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] містить декілька коренів." <<std::endl;
+            std::cerr << "Error: The chosen interval [" << a << ", " << b << "] contains multiple roots." << std::endl;
         return NAN;
     }
 
     double mid;
-    iterations = 0;
+    i = 0;
 
     while ((b - a) / 2 > eps) {
-        if (iterations >= n) {
-            std::cout << "\nПопередження: Досягнуто максимальної кількості ітерацій." << std::endl;
+        if (i >= n) {
+            std::cout << "\nWarning: Maximum number of iterations reached." << std::endl;
             break;
         }
 
@@ -57,63 +55,62 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
             a = mid;
             fa = fmid;
         }
-        iterations++;
+        i++;
     }
 
     return mid;
 }
 
-// Рекурсивний метод половинного ділення
-double bisection_recursive(double (*f)(double), double a, double b, double eps, int n, int& iterations) {
-    if (iterations >= n) {
-        std::cout << "\nПопередження: Досягнуто максимальної кількості ітерацій." << std::endl;
-        return (a + b) / 2;
+// Recursive bisection method
+double bisection_recursive(double (*f)(double), double a, double b, double x0, double eps, int n, int& i) {
+    double fa = f(a), fb = f(b);
+
+    if (fa * fb > 0) {
+        if (fa > 0 && fb > 0)
+            std::cerr << "Error: The chosen interval [" << a << ", " << b << "] does not contain a root, as the function values at both ends are positive." << std::endl;
+        else if (fa < 0 && fb < 0)
+            std::cerr << "Error: The chosen interval [" << a << ", " << b << "] does not contain a root, as the function values at both ends are negative." << std::endl;
+        else
+            std::cerr << "Error: The chosen interval [" << a << ", " << b << "] contains multiple roots." << std::endl;
+        return NAN;
     }
 
-    if (iterations == 0) {
-        double fa = f(a), fb = f(b);
-
-        if (fa * fb > 0) {
-            if (fa > 0 && fb > 0)
-                std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] не містить кореня, оскільки значення функції в обох кінцях додатні." <<std::endl;
-            else if (fa < 0 && fb < 0)
-                std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] не містить кореня, оскільки значення функції в обох кінцях від'ємні." <<std::endl;
-            else
-                std::cerr << "Помилка: Обраний проміжок [" << a << ", " << b << "] містить декілька коренів.\n";
-            return NAN;
-        }
+    if (i >= n) {
+        std::cout << "\nWarning: Maximum number of iterations reached." << std::endl;
+        return (a + b) / 2;
     }
 
     double mid = (a + b) / 2;
     double fmid = f(mid);
 
-    if (fabs(fmid) < eps || (b - a) / 2 < eps || iterations >= n) {
+    if (fabs(mid - x0) < eps || (b - a) / 2 < eps) {
         return mid;
     }
 
-    iterations++;
+    i++;
 
     if (f(a) * fmid < 0) {
-        return bisection_recursive(f, a, mid, eps, n, iterations);
+        return bisection_recursive(f, a, mid, mid, eps, n, i);
     }
     else {
-        return bisection_recursive(f, mid, b, eps, n, iterations);
+        return bisection_recursive(f, mid, b, mid, eps, n, i);
     }
 }
 
 int main() {
-    SetConsoleCP(1251); // встановлення кодування Windows-1251 в  потік введення
-    SetConsoleOutputCP(1251); // встановлення кодування Windows-1251 в  потік виведення
+    // Set console code page to UTF-8
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
 
-    std::cout << "Метод половинного ділення\n";
+    std::cout << "Bisection Method\n";
     std::cout << "1. f(x) = 2x - 9\n";
     std::cout << "2. f(x) = -2x^3 + 1\n";
     std::cout << "3. f(x) = 0.75x * sin(pi * x / 4) + 0.9 * cos(pi * x / 4)\n";
-    std::cout << "Оберіть функцію: ";
+    std::cout << "Choose a function: ";
 
     int choice;
     while (!(std::cin >> choice) || choice < 1 || choice > 3) {
-        std::cout << "Помилка: введено некоректний номер функції. Введи номер фунції (1-3): ";
+        std::cout << "Error: Invalid function number. Enter function number (1-3): ";
         std::cin.clear();
         std::cin.ignore(10000, '\n');
     }
@@ -124,141 +121,173 @@ int main() {
     case 2: f = f2; break;
     case 3: f = f3; break;
     default:
-       return 1;
+        return 1;
     }
 
     double a, b, eps;
     int n;
 
-    std::cout << "Введіть межі проміжку [a, b]: ";
-	while (!(std::cin >> a >> b) || a >= b) {
-		std::cout << "Помилка: a має бути менше за b. Введіть межі проміжку [a, b]: ";
-		std::cin.clear();
-		std::cin.ignore(10000, '\n');
-	}
+    std::cout << "Enter interval bounds [a, b]: ";
+    while (!(std::cin >> a >> b) || a >= b) {
+        std::cout << "Error: a must be less than b. Enter interval bounds [a, b]: ";
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+    }
 
-    std::cout << "Введіть точність (eps): ";
-	while (!(std::cin >> eps) || eps <= 0) {
-		std::cout << "Помилка: точність має бути додатним числом. Введіть точність (eps): ";
-		std::cin.clear();
-		std::cin.ignore(10000, '\n');
-	}
+    std::cout << "Enter precision (eps): ";
+    while (!(std::cin >> eps) || eps <= 0) {
+        std::cout << "Error: Precision must be a positive number. Enter precision (eps): ";
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+    }
 
-    std::cout << "Введіть максимальну кількість ітерацій: ";
-	while (!(std::cin >> n) || n <= 0) {
-		std::cout << "Помилка: кількість ітерацій має бути додатним числом. Введіть максимальну кількість ітерацій: ";
-		std::cin.clear();
-		std::cin.ignore(10000, '\n');
-	}
+    std::cout << "Enter maximum number of iterations: ";
+    while (!(std::cin >> n) || n <= 0) {
+        std::cout << "Error: Number of iterations must be a positive number. Enter maximum number of iterations: ";
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+    }
 
     int iterations = 0;
 
-    // Виконання ітеративного методу
+    // Execute iterative method
     double root_iter = bisection_iterative(f, a, b, eps, n, iterations);
-    std::cout << "Ітеративний метод:" << std::endl;
-    std::cout << "Знайдений корінь: " << std::fixed << std::setprecision(8) << root_iter <<  std::endl;
-    std::cout << "Кількість ітерацій: " << iterations <<  std::endl;
-    std::cout << "f(root) = " << f(root_iter) <<  std::endl;
+    std::cout << "Iterative method:" << std::endl;
+    std::cout << "Root found: " << std::fixed << std::setprecision(8) << root_iter << std::endl;
+    std::cout << "Number of iterations: " << iterations << std::endl;
+    std::cout << "f(root) = " << f(root_iter) << std::endl;
 
-    // Виконання рекурсивного методу
+	std::cout << std::endl;
+
+    // Execute recursive method
     iterations = 0;
-    double root_rec = bisection_recursive(f, a, b, eps, n, iterations);
-    std::cout << "Рекурсивний метод:" << std::endl;
-    std::cout << "Знайдений корінь: " << std::fixed << std::setprecision(8) << root_rec <<  std::endl;
-    std::cout << "Кількість ітерацій: " << iterations <<  std::endl;
+    double x0 = a; // Initial approximation
+    double root_rec = bisection_recursive(f, a, b, x0, eps, n, iterations);
+    std::cout << "Recursive method:" << std::endl;
+    std::cout << "Root found: " << std::fixed << std::setprecision(8) << root_rec << std::endl;
+    std::cout << "Number of iterations: " << iterations << std::endl;
     std::cout << "f(root) = " << f(root_rec) << std::endl;
 
     return 0;
 }
 
-//Тести:
+// Tests:
 //
-//test1
+// test1
+// input: f(x)=2x-9; [0, 10]; eps = 1e-3; n = 100
+// Iterative output: 
+// Root found: 4.49951172 
+// Number of iterations: 11
+// f(root) = -0.00097656
 //
-//Iterative
-//input: f(x)=2x-9; [0, 10]; eps = 1e-3; n = 100
-//output: root = 4.50000000; f(root) = 0.00000000; i = 11
+// Recursive output:
+// Root found: 4.50012207
+// Number of iterations: 13
+// f(root) = 0.00024414
 //
-//Recursive
-//input: f(x)=2x-9; [0, 10]; eps = 1e-3; n = 100
-//output: root = 4.50000000; f(root) = 0.00000000; i = 11
+// test2
 //
-//test2
+// input: f(x)=2x-9; [0, 10]; eps = 1e-5; n = 100
+// Iterative output: 
+// Root found: 4.49998856 
+// Number of iterations: 19
+// f(root) = -0.00002289
 //
-//Iterative
-//input: f(x)=2x-9; [0, 10]; eps = 1e-5; n = 100
-//output: root = 4.50000000; f(root) = 0.00000000; i = 19
+// Recursive output:
+// Root found: 4.50000000
+// Number of iterations: 19
+// f(root) = 0.00000381
 //
-//Recursive
-//input: f(x)=2x-9; [0, 10]; eps = 1e-5; n = 100
-//output: root = 4.50000000; f(root) = 0.00000000; i = 19
+// test3
 //
-//test3 (maximum number of the steps)
+// // input: f(x)=2x-9; [0, 10]; eps = 1e-3; n = 3
+// Iterative output:
+// // Warning: Maximum number of iterations reached.
+// Root found : 3.75000000
+// Number of iterations : 3
+// f(root) = -1.50000000
 //
-//Iterative
-//input: f(x)=2x-9; [0, 10]; eps = 1e-3; n = 3
-//output: root = 4.37500000; f(root) = -0.25000000; i = 3
+// Recursive output:
+// // Warning: Maximum number of iterations reached.
+// Root found: 4.37500000
+// Number of iterations: 3
+// f(root) = -0.25000000
+// 
+// test4
 //
-//Recursive
-//input: f(x)=2x-9; [0, 10]; eps = 1e-3; n = 3
-//output: root = 4.37500000; f(root) = -0.25000000; i = 3
+// input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-3; n = 100
+// Iterative output: 
+// Root found : 0.79492188
+// Number of iterations : 10
+// f(root) = -0.00462352
 //
-//test4
+// Recursive output:
+// Root found : 0.79394531
+// Number of iterations : 10
+// f(root) = -0.00092552
 //
-//Iterative
-//input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-3; n = 100
-//output: root = 0.79370117; f(root) = -0.00001526; i = 11
+// test5
 //
-//Recursive
-//input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-3; n = 100
-//output: root = 0.79370117; f(root) = -0.00001526; i = 11
+// input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-5; n = 100
+// Iterative output: 
+// Root found : 0.79370117
+// Number of iterations : 12
+// f(root) = -0.00000244
 //
-//test5
+// Recursive output:
+// Root found : 0.79369354
+// Number of iterations : 17
+// f(root) = 0.00002640
 //
-//Iterative
-//input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-5; n = 100
-//output: root = 0.79370053; f(root) = -0.00000000; i = 19
+// test6
 //
-//Recursive
-//input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-5; n = 100
-//output: root = 0.79370053; f(root) = -0.00000000; i = 19
+// input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-3; n = 3
+// Iterative output: 
+// Warning: Maximum number of iterations reached.
+// Root found : 0.75000000
+// Number of iterations : 3
+// f(root) = 0.15625000
 //
-//test6 (maximum number of the steps)
+// Recursive output:
+// Warning : Maximum number of iterations reached.
+// Root found : 0.87500000
+// Number of iterations : 3
+// f(root) = -0.33984375
 //
-//Iterative
-//input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-3; n = 3
-//output: root = 0.0; f(root) = 1.0; i = 3
+// test7
+// input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-4, 3]; eps = 1e-3; n = 100
+// Iterative output: 
+// Root found : -3.58813477
+// Number of iterations : 12
+// f(root) = 0.00208829
 //
-//Recursive
-//input: f(x)=-2x^3+1; [-1, 1]; eps = 1e-3; n = 3
-//output: root = 0.0; f(root) = 1.0; i = 3
+// Recursive output:
+// Root found : -3.58898926
+// Number of iterations : 12
+// f(root) = 0.00038723
 //
-//test7
+// test8
+// input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-4, 3]; eps = 1e-5; n = 100
+// Iterative output: 
+// Root found : -3.58918953
+// Number of iterations : 19
+// f(root) = -0.00001158
 //
-//Iterative
-//input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-1, 1]; eps = 1e-3; n = 100
-//output: root = -0.56835938; f(root) = 0.00000000; i = 11
+// Recursive output:
+// Root found : -3.58918285
+// Number of iterations : 19
+// f(root) = 0.00000172
 //
-//Recursive
-//input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-1, 1]; eps = 1e-3; n = 100
-//output: root = -0.56835938; f(root) = 0.00000000; i = 11
+// test9
+// input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-4, 3]; eps = 1e-3; n = 3
+// Iterative output:
+// Warning: Maximum number of iterations reached.
+// Root found : -3.12500000
+// Number of iterations : 3
+// f(root) = 0.79114985
 //
-//test8
-//
-//Iterative
-//input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-1, 1]; eps = 1e-5; n = 100
-//output: root = -0.56835938; f(root) = 0.00000000; i = 19
-//
-//Recursive
-//input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-1, 1]; eps = 1e-5; n = 100
-//output: root = -0.56835938; f(root) = 0.00000000; i = 19
-//
-//test9 (maximum number of the steps)
-//
-//Iterative
-//input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-1, 1]; eps = 1e-3; n = 3
-//output: root = -0.75; f(root) = 0.09659258; i = 3
-//
-//Recursive
-//input: f(x)=0.75x*sin(pi*x/4)+0.9*cos(pi*x/4); [-1, 1]; eps = 1e-3; n = 3
-//output: root = -0.75; f(root) = 0.09659258; i = 3
+// Recursive output:
+// Warning: Maximum number of iterations reached.
+// Root found : -3.56250000
+// Number of iterations : 3
+// f(root) = 0.05273792
