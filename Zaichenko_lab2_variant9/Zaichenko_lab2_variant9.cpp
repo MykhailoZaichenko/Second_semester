@@ -46,6 +46,7 @@ double bisection_iterative(double (*f)(double), double a, double b, double eps, 
         }
 
         if (std::signbit(fa) != std::signbit(fmid)) {
+        //if (fa < 0 && fmid > 0 || fa > 0 && fmid <0) {
         //if (fa * fmid < 0) {
             b = mid;
             fb = fmid;
