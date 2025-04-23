@@ -93,70 +93,71 @@ int main() {
     return 0;
 }
 
-// Tests:
-//
+// Tests
+// 
 // test1
-// input:
 // m = 3, n = 3
-// matrix:
-// 1  2   3
-// -1 2  -3
-// -2 3   4
-// output after sorting:
-// -2  3   4       // characteristic = 2
-// 1   2   3       // characteristic = 1
-// -1  2  -3       // characteristic = 1
+// Initial matrix:
+// 1       2       3
+// -1      2      -3
+// -2      3       4
 //
+// Sorted matrix by row characteristics (descending):
+// -2      3       4
+// 1       2       3
+// -1      2      -3
+
 // test2
-// input:
 // m = 2, n = 4
-// matrix:
-// 5  -6  0  1
-// 2   0  3  4
-// output after sorting:
-// 2   0   3   4    // characteristic = 0
-// 5  -6   0   1    // characteristic = 0
+// Initial matrix:
+// -5     -6     -7     -8
+// 1       0       2       3
 //
+// Sorted matrix by row characteristics (descending):
+// 1       0       2       3
+// -5     -6     -7     -8
+
 // test3
-// input:
 // m = 4, n = 2
-// matrix:
-// -3  4
-// -1 -1
-//  0  5
-// -2  1
-// output after sorting:
-// -1 -1        // characteristic = 1
-// -2  1        // characteristic = 1
-// -3  4        // characteristic = 3
-// 0   5        // characteristic = 0
+// Initial matrix:
+// 7      -7
+// 5       5
+// -1     -2
+// 0       0
 //
+// Sorted matrix by row characteristics (descending):
+// 7      -7
+// 5       5
+// -1     -2
+// 0       0
+
 // test4
-// input:
-// m = 1, n = 3
-// matrix:
-// -7  2  0
-// output after sorting:
-// -7  2  0        // no change since only one row
+// m = 3, n = 3
+// Initial matrix:
+// -2     -3     -4
+// -1     -1     -1
+//  2      3      4
 //
+// Sorted matrix by row characteristics (descending):
+//  2      3      4
+// -1     -1     -1
+// -2     -3     -4
+
 // test5
-// input:
-// m = 3, n = 1
-// matrix:
-// -5
-// -1
-//  0
-// output after sorting:
-// -1       // characteristic = 1
-//  0       // characteristic = 0
-// -5       // characteristic = 5
-//
-// test6
-// input:
 // m = 2, n = 2
-// matrix:
-// -2 2
-// -2 2
-// output after sorting:
-// -2 2
-// -2 2        // same characteristics, original order preserved
+// Initial matrix:
+// -1      1
+// -0.5   0.5
+//
+// Sorted matrix by row characteristics (descending):
+// -1      1
+// -0.5   0.5
+
+// test6
+// m = 1, n = 5
+// Initial matrix:
+// -10     -20     -30     -40     -50
+//
+// Sorted matrix by row characteristics (descending):
+// -10     -20     -30     -40     -50
+
