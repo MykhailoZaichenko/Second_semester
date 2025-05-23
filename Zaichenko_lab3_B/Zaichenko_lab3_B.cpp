@@ -1,7 +1,35 @@
 #include <iostream>
-#include <vector>
 #include <iomanip>
 using namespace std;
+
+// Функція для формування зигзагового масиву (без vector)
+int* zigzag_sorting(int* matrix, int m, int n, int& size) {
+    int* zigzag = new int[m * n];  // Виділяємо максимальну можливу кількість елементів
+    size = 0;
+
+    for (int diag_shift = n - 1; diag_shift >= -(m - 1); --diag_shift) {
+        if ((n - 1 - diag_shift) % 2 == 0) {
+            // Парна діагональ — знизу вгору
+            for (int i = m - 1; i >= 0; --i) {
+                int j = diag_shift + i;
+                if (j >= 0 && j < n) {
+                    zigzag[size++] = matrix[i * n + j];
+                }
+            }
+        }
+        else {
+            // Непарна діагональ — згори вниз
+            for (int i = 0; i < m; ++i) {
+                int j = diag_shift + i;
+                if (j >= 0 && j < n) {
+                    zigzag[size++] = matrix[i * n + j];
+                }
+            }
+        }
+    }
+
+    return zigzag;
+}
 
 // Функція для виводу матриці
 void print_matrix(int* matrix, int m, int n) {
@@ -11,30 +39,6 @@ void print_matrix(int* matrix, int m, int n) {
         }
         cout << endl;
     }
-}
-
-// Функція для формування зигзагового вектора по діагоналі, починаючи з правого верхнього кута
-std::vector<int> zaigzag_sorting(int* matrix, int m, int n) {
-    std::vector<int> zigzag;
-    for (int diag_shift = n - 1; diag_shift >= -(m - 1); --diag_shift) {
-        if ((n - 1 - diag_shift) % 2 == 0) {
-            for (int i = m - 1; i >= 0; --i) {
-                int j = diag_shift + i;
-                if (j >= 0 && j < n) {
-                    zigzag.push_back(matrix[i * n + j]);
-                }
-            }
-        }
-        else {
-            for (int i = 0; i < m; ++i) {
-                int j = diag_shift + i;
-                if (j >= 0 && j < n) {
-                    zigzag.push_back(matrix[i * n + j]);
-                }
-            }
-        }
-    }
-    return zigzag;
 }
 
 // Функція для виводу зигзагового вектора
@@ -69,57 +73,19 @@ int main() {
     cout << "\nInitial matrix:" << endl;
     print_matrix(matrix, m, n);
 
-    vector<int> zigzag = zaigzag_sorting(matrix, m, n);
+    int size = 0;
+    int* zigzag = zigzag_sorting(matrix, m, n, size);
 
-    cout << endl << "Zigzag vector:" << endl;
-    for (int val : zigzag) {
-        cout << setw(8) << val;
+    cout << "\nZigzag vector:" << endl;
+    for (int i = 0; i < size; ++i) {
+        cout << setw(8) << zigzag[i];
     }
     cout << endl;
 
     delete[] matrix;
+    delete[] zigzag;
     return 0;
 }
-
-//int main() {
-//    int m = 5, n = 8;
-//    std::cout << "Input rows (m > 0): " << m << std::endl;
-//    std::cout << "Input cols (n > 0): " << n << std::endl;
-//
-//    int* matrix = new int[m * n];
-//    std::cout << "Enter matrix elements:" << std::endl;
-//
-//    int values[] = {
-//        11,12,13,14,15,16,17,18,
-//        21,22,23,24,25,26,27,28,
-//        31,32,33,34,35,36,37,38,
-//        41,42,43,44,45,46,47,48,
-//        51,52,53,54,55,56,57,58
-//    };
-//
-//    int idx = 0;
-//    for (int i = 0; i < m; ++i) {
-//        for (int j = 0; j < n; ++j) {
-//            std::cout << "matrix[" << i << "][" << j << "] ";
-//            matrix[i * n + j] = values[idx++];
-//            std::cout << matrix[i * n + j] << std::endl;
-//        }
-//    }
-//
-//    std::cout << "\nInitial matrix:" << std::endl;
-//    print_matrix(matrix, m, n);
-//
-//    std::vector<int> zigzag = zaigzag_sorting(matrix, m, n);
-//
-//    std::cout << std::endl << "Zigzag vector:" << std::endl;
-//    for (int val : zigzag) {
-//        std::cout << std::setw(8) << val;
-//    }
-//    std::cout << std::endl;
-//
-//    delete[] matrix;
-//    return 0;
-//}
 
 // Tests:
 //
@@ -194,3 +160,10 @@ int main() {
 // Zigzag vector:
 // 3       2       6       9       5       1       4       8       12      11      7       10
 
+// test8
+// m = 1, n = 1
+//Initial matrix :
+// 0
+//
+//Zigzag vector :
+// 0

@@ -19,13 +19,13 @@ double row_characteristic(double* row, int n) {
 void insertion_sort(double** matrix, int m, int n) {
     for (int i = 1; i < m; ++i) {
         double* current_row = matrix[i];
-        double current_char = row_characteristic(current_row, n);
-        int j = i - 1;
-        while (j >= 0 && row_characteristic(matrix[j], n) < current_char) {
-            matrix[j + 1] = matrix[j]; // «суваЇмо р€дки вниз
-            j--;
+        double current_charac = row_characteristic(current_row, n);
+        int prev_row = i - 1;
+        while (prev_row >= 0 && row_characteristic(matrix[prev_row], n) < current_charac) {
+            matrix[prev_row + 1] = matrix[prev_row]; // «суваЇмо р€дки вниз
+            prev_row--;
         }
-        matrix[j + 1] = current_row;
+        matrix[prev_row + 1] = current_row;
     }
 }
 
@@ -139,9 +139,9 @@ int main() {
 //  2      3      4
 //
 // Sorted matrix by row characteristics (descending):
+// -2     -3     -4
 //  2      3      4
 // -1     -1     -1
-// -2     -3     -4
 
 // test5
 // m = 2, n = 2
@@ -161,3 +161,10 @@ int main() {
 // Sorted matrix by row characteristics (descending):
 // -10     -20     -30     -40     -50
 
+// test7
+// m = 1, n = 1
+//Initial matrix :
+//    0
+//
+//Sorted matrix by row characteristics(descending) :
+//    0
