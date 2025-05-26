@@ -1,3 +1,11 @@
-Shrek	2001	90	A green ogre finds love.	PG	DreamWorks
-Toy Story	1995	81	Toys come to life.	G	Pixar
-Spirited Away	2001	125	A girl enters spirit world.	PG	Ghibli
+ID	Title	Year	Runtime	Synopsis	Rating	StudioID
+1	Pathaan	2023	146	A Indian spy thriller	4.5	7
+2	Inception	2010	148	Dream within a dream	4.8	2
+3	Spirited Away	2001	125	A magical journey	4.9	3
+4	Kabhi Khushi Kabhie Gham	2001	210	Family drama	4.3	4
+5	Jurassic World	2015	124	Dinosaurs in modern world	4.0	5
+6	Moscow Does Not Believe in Tears	1980	150	Drama about life in Moscow	4.7	6
+7	Dhoom 3	2013	172	Action thriller	4.2	1
+8	Top Gun: Maverick	2022	130	Fighter pilot drama	4.6	8
+9	War	2019	154	Action spy thriller	4.4	1
+10	The Dark Knight	2008	152	Superhero drama	4.9	2 
