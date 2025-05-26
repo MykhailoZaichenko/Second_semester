@@ -1,8 +1,8 @@
 ﻿ID	StudioName	Website	Country
-1	Studio Alpha	https://alpha.com	USA
-2	Studio Beta	https://beta.de	Germany
-3	Studio Gamma	https://gamma.uk	UK
-4	Pixar	https://pixar.com	USA
-5	Ghibli	https://ghibli.jp	Japan
-6	UFA	https://ufa.de	Germany
-7	Rajkamal	https://rajkamal.in	India
+1	Studio Alpha	USA	https://alpha.com
+2	Studio Beta	Germany	https://beta.de
+3	Studio Gamma	UK	https://gamma.uk
+4	Pixar	USA	https://pixar.com
+5	Ghibli	Japan	https://ghibli.jp
+6	UFA	Germany	https://ufa.de
+7	Rajkamal	India	https://rajkamal.in

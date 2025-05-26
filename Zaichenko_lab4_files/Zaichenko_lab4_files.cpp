@@ -69,10 +69,16 @@ StudioNode* read_studios(std::ifstream& studios_file) {
     while (std::getline(studios_file, line)) {
         // Розбираємо рядок на токени
         size_t pos = 0;
+        // Updated to match: studio_id	studio_name	country	website
         TokenResult id_token = get_next_token(line, pos, '\t');
         TokenResult name_token = get_next_token(line, id_token.next_pos, '\t');
-        TokenResult website_token = get_next_token(line, name_token.next_pos, '\t');
-        TokenResult country_token = get_next_token(line, website_token.next_pos, '\t');
+        TokenResult country_token = get_next_token(line, name_token.next_pos, '\t');
+        TokenResult website_token = get_next_token(line, country_token.next_pos, '\t');
+
+        //TokenResult id_token = get_next_token(line, pos, '\t');
+        //TokenResult name_token = get_next_token(line, id_token.next_pos, '\t');
+        //TokenResult website_token = get_next_token(line, name_token.next_pos, '\t');
+        //TokenResult country_token = get_next_token(line, website_token.next_pos, '\t');
 
         // Створюємо новий вузол та додаємо його до списку
         int id = std::stoi(id_token.token);
@@ -117,13 +123,22 @@ Node* read_from_tsv(std::ifstream& movies_file, std::ifstream& studios_file) {
     while (std::getline(movies_file, line)) {
         // Розбираємо рядок на токени
         size_t pos = 0;
-        TokenResult id_token = get_next_token(line, pos, '\t');
+        // movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
+        TokenResult id_token = get_next_token(line, pos, '\t'); // movie_id (skip)
         TokenResult title_token = get_next_token(line, id_token.next_pos, '\t');
         TokenResult year_token = get_next_token(line, title_token.next_pos, '\t');
         TokenResult runtime_token = get_next_token(line, year_token.next_pos, '\t');
         TokenResult synopsis_token = get_next_token(line, runtime_token.next_pos, '\t');
         TokenResult rating_token = get_next_token(line, synopsis_token.next_pos, '\t');
         TokenResult studio_id_token = get_next_token(line, rating_token.next_pos, '\t');
+
+        //TokenResult id_token = get_next_token(line, pos, '\t');
+        //TokenResult title_token = get_next_token(line, id_token.next_pos, '\t');
+        //TokenResult year_token = get_next_token(line, title_token.next_pos, '\t');
+        //TokenResult runtime_token = get_next_token(line, year_token.next_pos, '\t');
+        //TokenResult synopsis_token = get_next_token(line, runtime_token.next_pos, '\t');
+        //TokenResult rating_token = get_next_token(line, synopsis_token.next_pos, '\t');
+        //TokenResult studio_id_token = get_next_token(line, rating_token.next_pos, '\t');
 
         // Створюємо об'єкт фільму
         Movie movie;
@@ -253,8 +268,8 @@ void write_to_tsv(std::ofstream& out_file, const Node* head) {
         out_file << movie.title << "\t"
             << movie.release_year << "\t"
             << movie.runtime_minutes << "\t"
+            << (movie.synopsis.empty() ? "(none)" : movie.synopsis) << "\t"
             << movie.rating << "\t"
-			<< (movie.synopsis.empty() ? "(none)" : movie.synopsis) << "\t"
             << movie.studio_info.studio_name << "\t"
             << movie.studio_info.country << "\t"
             << movie.studio_info.website << "\n";
