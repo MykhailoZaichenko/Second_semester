@@ -148,17 +148,22 @@ Node* read_from_tsv(std::ifstream& movies_file, std::ifstream& studios_file) {
         movie.synopsis = synopsis_token.token;
         movie.rating = rating_token.token;
 
-        // Знаходимо та додаємо інформацію про студію
-        int studio_id = std::stoi(studio_id_token.token);
+        int studio_id;
+        try {
+            studio_id = std::stoi(studio_id_token.token);
+        }
+        catch (...) {
+            std::cerr << "Warning: Invalid studio ID \"" << studio_id_token.token
+                << "\" for movie \"" << title_token.token << "\"." << std::endl;
+            studio_id = -1;
+        }
+
+        // Завжди намагаємось призначити студію (навіть якщо ID невалідний)
         Studio* studio = find_studio(studios, studio_id);
         if (studio != nullptr) {
             movie.studio_info = *studio;
         }
-        else {
-            // Якщо студію не знайдено — попередження + значення за замовчуванням
-            std::cerr << "Warning: Studio ID " << studio_id << " not found for movie \"" << movie.title << "\"\n";
-            movie.studio_info = { "Unknown", "-", "-" };
-        }
+
 
         // Створюємо новий вузол та додаємо його до списку
         Node* new_node = new Node(movie);
@@ -317,7 +322,7 @@ int main() {
 }
 
 // TESTS
-//
+// 
 // test1
 // Empty files
 // Input files:
@@ -331,16 +336,16 @@ int main() {
 // Removed films:
 // List is empty.
 // Output file extracted_movies.tsv: only header row
-//
+
 // test2
 // One German 18+ movie with no synopsis
 // Input data:
 // studios.tsv:
-// ID	StudioName	Website	Country
-// 1	UFA	https://ufa.de	Germany
+// studio_id	studio_name	country	website
+// 1	UFA	Germany	https://ufa.de
 //
 // movies.tsv:
-// ID	Title	Year	Runtime	Synopsis	Rating	StudioID
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
 // 1	Adult Film	2020	95		18+	1
 //
 // Expected output:
@@ -348,31 +353,34 @@ int main() {
 // List after removal: List is empty
 // Removed films: contains "Adult Film"
 // Output file extracted_movies.tsv: contains "Adult Film"
-//
+
 // test3
-// German 18+ movie with synopsis → should NOT be extracted
+// German 18+ movie with synopsis
 // Input:
-// movies.tsv:
-// 1	Adult Berlin	2018	100	A dramatic adult story.	18+	1
 // studios.tsv:
-// 1	UFA	https://ufa.de	Germany
+// studio_id	studio_name	country	website
+// 1	UFA	Germany	https://ufa.de
+//
+// movies.tsv:
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
+// 1	Adult Berlin	2018	100	A dramatic adult story.	18+	1
 //
 // Output:
 // Initial list: contains "Adult Berlin"
 // Removed films: List is empty
 // Remaining list: contains "Adult Berlin"
 // Output file: only header
-//
+
 // test4
 // Mixed data with multiple studios
 // studios.tsv:
-// ID	StudioName	Website	Country
-// 1	Studio Alpha	https://alpha.com	USA
-// 2	Studio Beta	https://beta.de	Germany
-// 3	UFA	https://ufa.de	Germany
+// studio_id	studio_name	country	website
+// 1	Studio Alpha	USA	https://alpha.com
+// 2	Studio Beta	Germany	https://beta.de
+// 3	UFA	Germany	https://ufa.de
 //
 // movies.tsv:
-// ID	Title	Year	Runtime	Synopsis	Rating	StudioID
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
 // 1	Child Movie	2010	90	Magic	0+	1
 // 2	German 18+	2011	88		18+	2
 // 3	Other Movie	2015	100	Plot	16+	3
@@ -383,12 +391,15 @@ int main() {
 // Removed films: contains "German 18+", "No Synopsis"
 // Remaining list: contains "Child Movie", "Other Movie"
 // extracted_movies.tsv: contains "German 18+", "No Synopsis"
-//
+
 // test5
 // Non-German 18+ movie with empty synopsis
 // studios.tsv:
-// 1	Studio Global	https://global.com	UK
+// studio_id	studio_name	country	website
+// 1	Studio Global	UK	https://global.com
+//
 // movies.tsv:
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
 // 1	No synopsis Adult	2022	90		18+	1
 //
 // Expected:
@@ -396,15 +407,15 @@ int main() {
 // Removed films: List is empty
 // Remaining list: contains "No synopsis Adult"
 // extracted_movies.tsv: only header
-//
+
 // test6
 // German movie with rating not equal to 18+
 // studios.tsv:
-// ID	StudioName	Website	Country
-// 1	UFA	https://ufa.de	Germany
+// studio_id	studio_name	country	website
+// 1	UFA	Germany	https://ufa.de
 //
 // movies.tsv:
-// ID	Title	Year	Runtime	Synopsis	Rating	StudioID
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
 // 1	Serious Drama	2021	90	Very emotional.	16+	1
 //
 // Expected:
@@ -412,15 +423,15 @@ int main() {
 // Removed films: List is empty
 // Remaining list: contains "Serious Drama"
 // extracted_movies.tsv: only header
-//
+
 // test7
 // German 18+ movie with whitespace-only synopsis
 // studios.tsv:
-// ID	StudioName	Website	Country
-// 1	UFA	https://ufa.de	Germany
+// studio_id	studio_name	country	website
+// 1	UFA	Germany	https://ufa.de
 //
 // movies.tsv:
-// ID	Title	Year	Runtime	Synopsis	Rating	StudioID
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
 // 1	Whitespace Movie	2020	91	 	18+	1
 //
 // Expected:
@@ -428,19 +439,37 @@ int main() {
 // Removed films: List is empty
 // Remaining list: contains "Whitespace Movie"
 // extracted_movies.tsv: only header
-//
+
 // test8
 // German 18+ movie with missing studio (invalid studio ID)
 // studios.tsv:
-// ID	StudioName	Website	Country
-// 1	UFA	https://ufa.de	Germany
+// studio_id	studio_name	country	website
+// 1	UFA	Germany	https://ufa.de
 //
 // movies.tsv:
-// ID	Title	Year	Runtime	Synopsis	Rating	StudioID
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
 // 1	Orphan Movie	2019	87		18+	99
 //
 // Expected:
-// Initial list: contains "Orphan Movie" (no matching studio info)
+// Warning printed: Studio ID 99 not found
+// Initial list: contains "Orphan Movie" with unknown studio
 // Removed films: List is empty
 // Remaining list: contains "Orphan Movie"
+// extracted_movies.tsv: only header
+
+// test9
+// Invalid studio ID (non-numeric)
+// studios.tsv:
+// studio_id	studio_name	country	website
+// 1	UFA	Germany	https://ufa.de
+//
+// movies.tsv:
+// movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
+// 8	Parasite	2019	132	Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.	R	(South Korean Studio)
+//
+// Expected:
+// Warning printed: Invalid studio ID "(South Korean Studio)" for movie "Parasite"
+// Initial list: contains "Parasite" with unknown studio
+// Removed films: List is empty
+// Remaining list: contains "Parasite"
 // extracted_movies.tsv: only header
