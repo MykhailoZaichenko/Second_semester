@@ -17,7 +17,7 @@ struct Movie {
     int runtime_minutes;
     std::string synopsis;
     std::string rating;
-    Studio studio_info;
+    Studio studioInfo;
 };
 
 struct Node {
@@ -29,12 +29,12 @@ struct Node {
 
 // Структура для зберігання результату розбору рядка на токени
 struct TokenResult {
-    std::string token;          // Отриманий токен
-    size_t next_pos;           // Позиція початку наступного токену
+    std::string token;
+    size_t nextPos;
 };
 
 // Функція для отримання наступного токену з рядка
-TokenResult get_next_token(const std::string& str, size_t start_pos, char delim) {
+TokenResult getNextToken(const std::string& str, size_t start_pos, char delim) {
     // Перевірка чи не вийшли за межі рядка
     if (start_pos >= str.length()) {
         return { "", str.length() };
@@ -59,39 +59,34 @@ struct StudioNode {
     StudioNode(int studio_id, const Studio& studio) : id(studio_id), data(studio), next(nullptr) {}
 };
 
-StudioNode* read_studios(std::ifstream& studios_file) {
+StudioNode* readStudios(std::ifstream& studiosFile) {
     StudioNode* head = nullptr;
     std::string line;
 
     // Пропускаємо заголовок файлу
-    std::getline(studios_file, line);
+    std::getline(studiosFile, line);
 
-    while (std::getline(studios_file, line)) {
+    while (std::getline(studiosFile, line)) {
         // Розбираємо рядок на токени
         size_t pos = 0;
         // Updated to match: studio_id	studio_name	country	website
-        TokenResult id_token = get_next_token(line, pos, '\t');
-        TokenResult name_token = get_next_token(line, id_token.next_pos, '\t');
-        TokenResult country_token = get_next_token(line, name_token.next_pos, '\t');
-        TokenResult website_token = get_next_token(line, country_token.next_pos, '\t');
-
-        //TokenResult id_token = get_next_token(line, pos, '\t');
-        //TokenResult name_token = get_next_token(line, id_token.next_pos, '\t');
-        //TokenResult website_token = get_next_token(line, name_token.next_pos, '\t');
-        //TokenResult country_token = get_next_token(line, website_token.next_pos, '\t');
+        TokenResult idToken = getNextToken(line, pos, '\t');
+        TokenResult nameToken = getNextToken(line, idToken.nextPos, '\t');
+        TokenResult countryToken = getNextToken(line, nameToken.nextPos, '\t');
+        TokenResult websiteToken = getNextToken(line, countryToken.nextPos, '\t');
 
         // Створюємо новий вузол та додаємо його до списку
-        int id = std::stoi(id_token.token);
-        Studio studio = { name_token.token, website_token.token, country_token.token };
+        int id = std::stoi(idToken.token);
+        Studio studio = { nameToken.token, websiteToken.token, countryToken.token };
 
-        StudioNode* new_node = new StudioNode(id, studio);
-        new_node->next = head;
-        head = new_node;
+        StudioNode* newNode = new StudioNode(id, studio);
+        newNode->next = head;
+        head = newNode;
     }
     return head;
 }
 
-void delete_studios(StudioNode* head) {
+void deleteStudios(StudioNode* head) {
     while (head != nullptr) {
         StudioNode* temp = head;
         head = head->next;
@@ -99,7 +94,7 @@ void delete_studios(StudioNode* head) {
     }
 }
 
-Studio* find_studio(StudioNode* studios, int id) {
+Studio* findStudio(StudioNode* studios, int id) {
     while (studios != nullptr) {
         if (studios->id == id) {
             return &studios->data;
@@ -109,98 +104,76 @@ Studio* find_studio(StudioNode* studios, int id) {
     return nullptr;
 }
 
-Node* read_from_tsv(std::ifstream& movies_file, std::ifstream& studios_file) {
-    StudioNode* studios = read_studios(studios_file);
+Node* readFromTsv(std::ifstream& moviesFile, std::ifstream& studiosFile) {
+    StudioNode* studios = readStudios(studiosFile);
 
     std::string line;
     Node* head = nullptr;
     Node* tail = nullptr;
 
     // Пропускаємо заголовок файлу фільмів
-    std::getline(movies_file, line);
+    std::getline(moviesFile, line);
 
     // Читаємо дані про фільми
-    while (std::getline(movies_file, line)) {
+    while (std::getline(moviesFile, line)) {
         // Розбираємо рядок на токени
         size_t pos = 0;
         // movie_id	title	release_year	runtime_minutes	synopsis	rating	studio_id
-        TokenResult id_token = get_next_token(line, pos, '\t'); // movie_id (skip)
-        TokenResult title_token = get_next_token(line, id_token.next_pos, '\t');
-        TokenResult year_token = get_next_token(line, title_token.next_pos, '\t');
-        TokenResult runtime_token = get_next_token(line, year_token.next_pos, '\t');
-        TokenResult synopsis_token = get_next_token(line, runtime_token.next_pos, '\t');
-        TokenResult rating_token = get_next_token(line, synopsis_token.next_pos, '\t');
-        TokenResult studio_id_token = get_next_token(line, rating_token.next_pos, '\t');
-
-        //TokenResult id_token = get_next_token(line, pos, '\t');
-        //TokenResult title_token = get_next_token(line, id_token.next_pos, '\t');
-        //TokenResult year_token = get_next_token(line, title_token.next_pos, '\t');
-        //TokenResult runtime_token = get_next_token(line, year_token.next_pos, '\t');
-        //TokenResult synopsis_token = get_next_token(line, runtime_token.next_pos, '\t');
-        //TokenResult rating_token = get_next_token(line, synopsis_token.next_pos, '\t');
-        //TokenResult studio_id_token = get_next_token(line, rating_token.next_pos, '\t');
+        TokenResult idToken = getNextToken(line, pos, '\t'); // movie_id (skip)
+        TokenResult titleToken = getNextToken(line, idToken.nextPos, '\t');
+        TokenResult yearToken = getNextToken(line, titleToken.nextPos, '\t');
+        TokenResult runtimeToken = getNextToken(line, yearToken.nextPos, '\t');
+        TokenResult synopsisToken = getNextToken(line, runtimeToken.nextPos, '\t');
+        TokenResult ratingToken = getNextToken(line, synopsisToken.nextPos, '\t');
+        TokenResult studioIdToken = getNextToken(line, ratingToken.nextPos, '\t');
 
         // Створюємо об'єкт фільму
         Movie movie;
-        movie.title = title_token.token;
-        movie.release_year = std::stoi(year_token.token);
-        movie.runtime_minutes = std::stoi(runtime_token.token);
-        movie.synopsis = synopsis_token.token;
-        movie.rating = rating_token.token;
+        movie.title = titleToken.token;
+        movie.release_year = std::stoi(yearToken.token);
+        movie.runtime_minutes = std::stoi(runtimeToken.token);
+        movie.synopsis = synopsisToken.token;
+        movie.rating = ratingToken.token;
 
         int studio_id;
         try {
-            studio_id = std::stoi(studio_id_token.token);
+            studio_id = std::stoi(studioIdToken.token);
         }
         catch (...) {
-            std::cerr << "Warning: Invalid studio ID \"" << studio_id_token.token
-                << "\" for movie \"" << title_token.token << "\"." << std::endl;
+            std::cerr << "Warning: Invalid studio ID \"" << studioIdToken.token
+                << "\" for movie \"" << titleToken.token << "\"." << std::endl;
             studio_id = -1;
         }
 
         // Завжди намагаємось призначити студію (навіть якщо ID невалідний)
-        Studio* studio = find_studio(studios, studio_id);
+        Studio* studio = findStudio(studios, studio_id);
         if (studio != nullptr) {
-            movie.studio_info = *studio;
+            movie.studioInfo = *studio;
         }
 
 
         // Створюємо новий вузол та додаємо його до списку
-        Node* new_node = new Node(movie);
+        Node* newNode = new Node(movie);
 
         if (head == nullptr) {
-            head = new_node;
-            tail = new_node;
+            head = newNode;
+            tail = newNode;
         }
         else {
-            tail->next = new_node;
-            tail = new_node;
+            tail->next = newNode;
+            tail = newNode;
         }
     }
 
     // Звільняємо пам'ять списку студій
-    delete_studios(studios);
+    deleteStudios(studios);
     return head;
 }
 
-// Предикат для фільтрації німецьких фільмів 18+ без опису
-bool is_german_adult_without_synopsis(const Movie& movie) {
-    return movie.studio_info.country == "Germany" && movie.rating == "18+" && movie.synopsis.empty();
-}
-
-// Функція для видалення списку фільмів та звільнення пам'яті
-void delete_list(Node* head) {
-    while (head != nullptr) {
-        Node* temp = head;
-        head = head->next;
-        delete temp;
-    }
-}
-
 // Функція для вилучення елементів, що задовольняють предикату
-Node* extract_all(Node*& head, bool(*pred)(const Movie&)) {
-    Node* extracted_head = nullptr;
-    Node* extracted_tail = nullptr;
+Node* extractMovies(Node*& head, bool(*pred)(const Movie&)) {
+    Node* extractedHead = nullptr;
+    Node* extractedTail = nullptr;
     Node* current = head;
     Node* prev = nullptr;
 
@@ -218,13 +191,13 @@ Node* extract_all(Node*& head, bool(*pred)(const Movie&)) {
             Node* next = current->next;
             current->next = nullptr;
 
-            if (extracted_head == nullptr) {
-                extracted_head = current;
-                extracted_tail = current;
+            if (extractedHead == nullptr) {
+                extractedHead = current;
+                extractedTail = current;
             }
             else {
-                extracted_tail->next = current;
-                extracted_tail = current;
+                extractedTail->next = current;
+                extractedTail = current;
             }
 
             current = next;
@@ -235,10 +208,10 @@ Node* extract_all(Node*& head, bool(*pred)(const Movie&)) {
         }
     }
 
-    return extracted_head;
+    return extractedHead;
 }
 
-void print_list(std::ostream& out_stream, const Node* head) {
+void printList(std::ostream& out_stream, const Node* head) {
     if (head == nullptr) {
         out_stream << u8"List is empty.\n";
         return;
@@ -247,76 +220,90 @@ void print_list(std::ostream& out_stream, const Node* head) {
     while (head != nullptr) {
         const Movie& movie = head->data;
 
-        std::ostringstream runtime_stream;
-        runtime_stream << movie.runtime_minutes << " min";
+        std::ostringstream runtimeStream;
+        runtimeStream << movie.runtime_minutes << " min";
 
         out_stream << std::left << std::setw(20) << movie.title
             << std::setw(8) << movie.release_year
-            << std::setw(12) << runtime_stream.str()
+            << std::setw(12) << runtimeStream.str()
             << std::setw(30) << (movie.synopsis.empty() ? "(none)" : movie.synopsis)
             << std::setw(10) << movie.rating
-            << std::setw(20) << movie.studio_info.studio_name
-            << std::setw(15) << movie.studio_info.country
-            << std::setw(30) << movie.studio_info.website
+            << std::setw(20) << movie.studioInfo.studio_name
+            << std::setw(15) << movie.studioInfo.country
+            << std::setw(30) << movie.studioInfo.website
             << std::endl;
         head = head->next;
     }
 }
 
-void write_to_tsv(std::ofstream& out_file, const Node* head) {
+void writeToTsv(std::ofstream& outFile, const Node* head) {
     // Записуємо заголовок файлу
-    out_file << "Title\tYear\tRuntime\tSynopsis\tRating\tStudio\tCountry\tWebsite\n";
+    outFile << "Title\tYear\tRuntime\tSynopsis\tRating\tStudio\tCountry\tWebsite\n";
 
     // Записуємо дані про кожен фільм
     while (head != nullptr) {
         const Movie& movie = head->data;
-        out_file << movie.title << "\t"
+        outFile << movie.title << "\t"
             << movie.release_year << "\t"
             << movie.runtime_minutes << "\t"
             << (movie.synopsis.empty() ? "(none)" : movie.synopsis) << "\t"
             << movie.rating << "\t"
-            << movie.studio_info.studio_name << "\t"
-            << movie.studio_info.country << "\t"
-            << movie.studio_info.website << "\n";
+            << movie.studioInfo.studio_name << "\t"
+            << movie.studioInfo.country << "\t"
+            << movie.studioInfo.website << "\n";
         head = head->next;
+    }
+}
+
+// Перевірка для фільтрації німецьких фільмів 18+ без опису
+bool isGermanAdultWithoutSynopsis(const Movie& movie) {
+    return movie.studioInfo.country == "Germany" && movie.rating == "18+" && movie.synopsis.empty();
+}
+
+// Функція для видалення списку фільмів та звільнення пам'яті
+void deleteMovie(Node* head) {
+    while (head != nullptr) {
+        Node* temp = head;
+        head = head->next;
+        delete temp;
     }
 }
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
 
-    std::ifstream movies_file("movies.tsv");
-    std::ifstream studios_file("studios.tsv");
+    std::ifstream moviesFile("movies.tsv");
+    std::ifstream studiosFile("studios.tsv");
 
-    if (!movies_file.is_open() || !studios_file.is_open()) {
+    if (!moviesFile.is_open() || !studiosFile.is_open()) {
         std::cout << u8"Error: Unable to open input files" << std::endl;
         return 1;
     }
 
-    Node* head = read_from_tsv(movies_file, studios_file);
+    Node* head = readFromTsv(moviesFile, studiosFile);
 
     std::cout << u8"\nInitial list of films:" << std::endl;
-    print_list(std::cout, head);
+    printList(std::cout, head);
 
-    Node* extracted = extract_all(head, is_german_adult_without_synopsis);
+    Node* extracted = extractMovies(head, isGermanAdultWithoutSynopsis);
 
     std::cout << u8"\nList after removal:" << std::endl;
-    print_list(std::cout, head);
+    printList(std::cout, head);
 
     std::cout << u8"\nRemoved films:" << std::endl;
-    print_list(std::cout, extracted);
+    printList(std::cout, extracted);
 
-    std::ofstream out_file("extracted_movies.tsv");
-    if (out_file.is_open()) {
-        write_to_tsv(out_file, extracted);
+    std::ofstream outFile("extracted_movies.tsv");
+    if (outFile.is_open()) {
+        writeToTsv(outFile, extracted);
     }
 
-    delete_list(head);
-    delete_list(extracted);
+    deleteMovie(head);
+    deleteMovie(extracted);
 
-    movies_file.close();
-    studios_file.close();
-    out_file.close();
+    moviesFile.close();
+    studiosFile.close();
+    outFile.close();
 
     return 0;
 }
